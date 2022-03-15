@@ -44,8 +44,8 @@ router.put('/:id', async (req, res) => {
             res.json({message: 'Invalid date'});
         }
     } catch (error) {
-        console.log(error.message || err);
-        res.status(500).send('Server Error');
+        console.log(error.message || error);
+        res.status(500).send(error);
     }
 });
 
