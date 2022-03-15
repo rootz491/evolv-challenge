@@ -269,12 +269,14 @@
 
 *   Create an UPDATE Api which will receive date in the body and shift the date by 1 day if the session is not completed. Pass 9th March in the body of UPDATE Api and run to shift the 10th and 14th March sessions to 11th and 15th respectively
 
-    *   url: `http://localhost:3000/api/session/shift/`
+    *   url: `http://localhost:3000/api/session/:id/`
+
+    *   type: **PUT**
 
     *   body:
         ```json
         {
-            "sessionRef": "622a55e43ad23b7993889f19"
+            "date": "12 March 2020"
         }
         ```
 
@@ -303,7 +305,7 @@
                     ],
                     "_id": "622a55e43ad23b7993889f1a"
                 },
-                "date": "2021-03-13T18:30:00.000Z",
+                "date": "2020-03-13T18:30:00.000Z",
                 "userRef": "622a3cac4e72c3e08c9c5012",
                 "trainerRef": "622a3c874e72c3e08c9c5010",
                 "isCompleted": false,

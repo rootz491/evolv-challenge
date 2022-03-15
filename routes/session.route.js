@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const mongoose = require('mongoose');
 const { Session } = require('../models/session.model');
 
 // @route   POST api/session/
@@ -21,19 +22,27 @@ router.post('/', async (req, res) => {
     }
 });
 
-//  @route   GET api/session/shift
-router.put('/shift', async (req, res) => {
+//  @route   PUT api/session/:id
+router.put('/:id', async (req, res) => {
     try {
-        const { sessionRef } = req.body;
-        const session = await Session.findById(sessionRef);
-        if (session.isCompleted === false) {
-            session.date = new Date(session.date.setDate(session.date.getDate() + 1));
-            const newSession = await session.save();    
-            res.json({session: newSession});
+        const sessionRef = req.params.id;
+        if (mongoose.Types.ObjectId.isValid(sessionRef) === false) // check for valid ObjectId
+            throw new Error('Invalid session id');
+        const { date } = req.body;
+        const dateObj = new Date(date);
+        if (dateObj instanceof Date && !isNaN(dateObj)){ // check if date is valid
+            const session = await Session.findById(sessionRef);
+            if (session.isCompleted === false) {
+                dateObj.setTime(dateObj.getTime() + 1000 * 60 * 60 * 24 * 2);   // add 1 day
+                session.date = dateObj;
+                await session.save();    
+                res.json({session});
+            } else {
+                res.json({message: 'Session is already completed'});
+            }
         } else {
-            res.status(400).send('Session is already completed');
+            res.json({message: 'Invalid date'});
         }
-
     } catch (error) {
         console.log(error.message || err);
         res.status(500).send('Server Error');
