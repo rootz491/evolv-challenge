@@ -2,28 +2,6 @@ const router = require('express').Router();
 const { Exercise, ExerciseInfo, ExerciseSet } = require('../models/exercise.model');
 const { Session } = require('../models/session.model');
 
-// @route   GET api/exericse/
-router.get('/', async (req, res) => {
-    try {
-        const exercises = await Exercise.find();
-        res.json(exercises);
-    } catch (error) {
-        console.log(error.message || err);
-        res.status(500).send('Server Error');
-    }
-});
-
-//  @route   GET api/exercise/:id
-router.get('/:id', async (req, res) => {
-    try {   
-        const exercise = await Exercise.findById(req.params.id);
-        res.json(exercise);
-    } catch (error) {
-        console.log(error.message || err);
-        res.status(500).send('Server Error');
-    }
-});
-
 //  @route   PUT api/exercise/info
 //  @desc    create exercise info for referencing in user's session > workout > exercises
 router.post('/info', async (req, res) => {
@@ -42,9 +20,9 @@ router.post('/info', async (req, res) => {
 //  @desc    Create an exercise for session
 router.post('/', async (req, res) => {
     try {
-        const { exerciseName, userRef } = req.body;
+        const { exerciseName, userRef, sessionRef } = req.body;
         const exerciseInfo = await ExerciseInfo.findOne({ name: exerciseName });
-        const session = await Session.findOne({ userRef });
+        const session = await Session.findOne({ userRef, _id: sessionRef });
         const exercise = new Exercise({
             exerciseInfoRef: exerciseInfo._id,
             exerciseSets: []
@@ -62,8 +40,8 @@ router.post('/', async (req, res) => {
 //  @desc    Create an exercise set for exercise
 router.post('/set', async (req, res) => {
     try {
-        const { exerciseName, userRef, number, suggestedWeight, suggestedReps } = req.body;
-        const session = await Session.findOne({ userRef });
+        const { exerciseName, sessionRef, userRef, number, suggestedWeight, suggestedReps } = req.body;
+        const session = await Session.findOne({ userRef, _id: sessionRef });
         const ex = await ExerciseInfo.findOne({ name: exerciseName });
         session.workout.exercises.forEach(exercise => {
             if (exercise.exerciseInfoRef.toString() === ex._id.toString()) {
